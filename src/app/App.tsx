@@ -175,7 +175,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Doctors Tab */}
+        {/* Doctors Tab */}           
         {activeTab === 'doctors' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
