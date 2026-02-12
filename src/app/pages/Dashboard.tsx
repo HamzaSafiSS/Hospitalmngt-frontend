@@ -17,6 +17,9 @@ import { AppointmentList } from '../components/AppointmentList';
 import { BookAppointment } from '../components/BookAppointment';
 import { UpdateAppointment } from '../components/UpdateAppointment';
 
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext"
 type Tab = 'patients' | 'doctors' | 'appointments';
 type PatientView = 'list' | 'add';
 type DoctorView = 'list' | 'add';
@@ -40,6 +43,10 @@ export default function Dashboard() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [refreshAppointments, setRefreshAppointments] = useState(0);
 
+  const { logout } = useAuth()
+
+  const navigate = useNavigate();
+  
   // Patient handlers
   const handlePatientEdit = (patient: any) => {
     setSelectedPatient(patient);
@@ -106,6 +113,14 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-3xl text-blue-600">Hospital Management System</h1>
           <p className="mt-1 text-gray-600">FastAPI Backend Integration</p>
+          <button
+            onClick={() => {
+              logout()
+              navigate("/login") }}
+            className="ml-auto px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+            >
+            Logout
+</button>
         </div>
       </header>
 
