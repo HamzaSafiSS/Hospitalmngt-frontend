@@ -1,14 +1,33 @@
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
+import { useState } from "react"
 
 export default function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  const handleLogin = () => {
-    login() // mark as logged in
+ const handleLogin = async () => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const response = await fetch("http://127.0.0.1:8000/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  })
+
+  const data = await response.json()
+
+  if (response.ok) {
+    localStorage.setItem("token", data.access_token)
+    login()
     navigate("/dashboard")
+  } else {
+    alert(data.detail)
   }
+}
 
   return (
     <div className="min-h-screen flex justify-center items-center">
