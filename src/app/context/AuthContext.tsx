@@ -1,8 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react"
+import { jwtDecode } from "jwt-decode"
+
+type UserRole = "ADMIN" | "DOCTOR" | "PATIENT"
 
 type AuthContextType = {
   isAuthenticated: boolean
-  login: () => void
+  role: UserRole | null
+  login: (token: string) => void
   logout: () => void
 }
 
@@ -10,25 +14,33 @@ const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [role, setRole] = useState<UserRole | null>(null)
 
-  // ✅ Load auth state from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("isAuthenticated")
-    if (stored === "true") setIsAuthenticated(true)
+    const token = localStorage.getItem("token")
+    if (token) {
+      const decoded: any = jwtDecode(token)
+      setIsAuthenticated(true)
+      setRole(decoded.role)
+    }
   }, [])
 
-  const login = () => {
+  const login = (token: string) => {
+    const decoded: any = jwtDecode(token)
+
+    localStorage.setItem("token", token)
     setIsAuthenticated(true)
-    localStorage.setItem("isAuthenticated", "true")
+    setRole(decoded.role)
   }
 
   const logout = () => {
+    localStorage.removeItem("token")
     setIsAuthenticated(false)
-    localStorage.removeItem("isAuthenticated")
+    setRole(null)
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, role, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

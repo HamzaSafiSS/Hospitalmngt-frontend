@@ -1,10 +1,13 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
+import { jwtDecode } from "jwt-decode"
 
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleLogin = async () => {
     const response = await fetch("http://127.0.0.1:8000/login", {
@@ -18,12 +21,17 @@ export default function Login() {
 
     const data = await response.json()
 
-    if (response.ok) {
-      localStorage.setItem("token", data.access_token)
-      navigate("/dashboard")
-    } else {
-      alert(data.detail)
-    }
+ if (response.ok) {
+  login(data.access_token)
+
+  const decoded: any = jwtDecode(data.access_token)
+
+  if (decoded.role === "ADMIN") {
+    navigate("/admin")
+  } else {
+    navigate("/dashboard")
+  }
+}
   }
 
   return (
